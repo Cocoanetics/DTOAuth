@@ -10,8 +10,8 @@
  Controller for an OAuth 1.0a flow with 3 legs.
  
  1. Call -requestTokenWithCompletion: (leg 1)
- 2. Get the -userTokenAuthorizationRequest and load it in webview (leg 2)
- 3. Extract the verifier returned from the OAuth provider once the user authorizes the app
+ 2. Get the -userTokenAuthorizationRequest and load it in webview, DTOAuthWebViewController is provided for this (leg 2)
+ 3. Extract the verifier returned from the OAuth provider once the user authorizes the app, DTOAuthWebViewController does that via delegate method.
  4. Call -authorizeTokenWithVerifier:completion: passing this verifier (leg 3)
  */
 
