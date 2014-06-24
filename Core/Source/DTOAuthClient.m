@@ -164,7 +164,7 @@
 	NSData *secret = [signatureSecret dataUsingEncoding:NSUTF8StringEncoding];
 	
 	// use CommonCrypto to create a SHA1 digest
-	uint8_t digest[20] = {0};
+	uint8_t digest[CC_SHA1_DIGEST_LENGTH] = {0};
 	CCHmacContext cx;
 	CCHmacInit(&cx, kCCHmacAlgSHA1, secret.bytes, secret.length);
 	CCHmacUpdate(&cx, sigbase.bytes, sigbase.length);
