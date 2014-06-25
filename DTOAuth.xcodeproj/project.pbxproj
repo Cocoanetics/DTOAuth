@@ -34,6 +34,13 @@
 			remoteGlobalIDString = A786D8E81959A2B700442121;
 			remoteInfo = "Static Library (iOS)";
 		};
+		A70F8E1D195AFA530078C54C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A7B2732F195421F300E536A3 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A786D8E81959A2B700442121;
+			remoteInfo = "Static Library (iOS)";
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -280,6 +287,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				A70F8E1E195AFA530078C54C /* PBXTargetDependency */,
 			);
 			name = Demo;
 			productName = OAuthTest;
@@ -381,6 +389,11 @@
 			isa = PBXTargetDependency;
 			target = A786D8E81959A2B700442121 /* Static Library (iOS) */;
 			targetProxy = A70F8E1B195AD1240078C54C /* PBXContainerItemProxy */;
+		};
+		A70F8E1E195AFA530078C54C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A786D8E81959A2B700442121 /* Static Library (iOS) */;
+			targetProxy = A70F8E1D195AFA530078C54C /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 

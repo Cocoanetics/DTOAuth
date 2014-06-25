@@ -113,9 +113,50 @@
 	return [authParams copy];
 }
 
-// creates the OAuth Authorization header for a given request and set of auth parameters
+- (NSDictionary *)_paramsFromRequest:(NSURLRequest *)request
+{
+	NSMutableDictionary *extraParams = [NSMutableDictionary dictionary];
+	
+	NSString *query = [request.URL query];
+	
+	// parameters in the URL query string need to be considered for the signature
+	if ([query length])
+	{
+		[extraParams addEntriesFromDictionary:DTOAuthDictionaryFromQueryString(query)];
+	}
+	
+	if ([request.HTTPMethod isEqualToString:@"POST"] && [request.HTTPBody length])
+	{
+		NSString *contentType = [request allHTTPHeaderFields][@"Content-Type"];
+		
+		if ([contentType isEqualToString:@"application/x-www-form-urlencoded"])
+		{
+			NSString *bodyString = [[NSString alloc] initWithData:request.HTTPBody encoding:NSUTF8StringEncoding];
+			
+			[extraParams addEntriesFromDictionary:DTOAuthDictionaryFromQueryString(bodyString)];
+		}
+		else
+		{
+			NSLog(@"Content-Type %@ is not what we'd expect for a POST with a body");
+		}
+	}
+	
+	return [extraParams copy];
+}
+
+
+//creates the OAuth Authorization header for a given request and set of auth parameters
 - (NSString *)_authorizationHeaderForRequest:(NSURLRequest *)request authParams:(NSDictionary *)authParams
 {
+	NSMutableDictionary *signatureParams = [NSMutableDictionary dictionaryWithDictionary:authParams];
+	
+	NSDictionary *requestParams = [self _paramsFromRequest:request];
+	
+	if ([requestParams count])
+	{
+		[signatureParams addEntriesFromDictionary:requestParams];
+	}
+	
 	// mutable version of the OAuth header contents to add the signature
 	NSMutableDictionary *tmpDict = [NSMutableDictionary dictionaryWithDictionary:authParams];
 	
@@ -123,7 +164,7 @@
 														  scheme:[request.URL scheme]
 															 host:[request.URL host]
 															 path:[request.URL path]
-													 authParams:authParams];
+													 signatureParams:signatureParams];
 	
 	tmpDict[@"oauth_signature"] = signature;
 	
@@ -156,15 +197,19 @@
 }
 
 // constructs the cryptographic signature for this combination of parameters
-- (NSString *)_signatureForMethod:(NSString *)method scheme:(NSString *)scheme host:(NSString *)host path:(NSString *)path authParams:(NSDictionary *)authParams
+- (NSString *)_signatureForMethod:(NSString *)method scheme:(NSString *)scheme host:(NSString *)host path:(NSString *)path signatureParams:(NSDictionary *)signatureParams
 {
-	NSString *authParamString = [self _stringFromParamDictionary:authParams];
+	NSLog(@"%@", signatureParams);
+	
+	NSString *authParamString = [self _stringFromParamDictionary:signatureParams];
 	NSString *signatureBase = [NSString stringWithFormat:@"%@&%@%%3A%%2F%%2F%@%@&%@",
 										[method uppercaseString],
 										[scheme lowercaseString],
 										[self _urlEncodedString:[host lowercaseString]],
 										[self _urlEncodedString:path],
 										[self _urlEncodedString:authParamString]];
+	
+	NSLog(@"%@", signatureBase);
 	
 	NSString *signatureSecret = [NSString stringWithFormat:@"%@&%@", _consumerSecret, _tokenSecret ?: @""];
 	NSData *sigbase = [signatureBase dataUsingEncoding:NSUTF8StringEncoding];
@@ -255,19 +300,8 @@
 
 - (NSString *)authenticationHeaderForRequest:(NSURLRequest *)request
 {
-	NSMutableDictionary *extraParams = [NSMutableDictionary dictionary];
+	NSDictionary *authParams = [self _authorizationParametersWithExtraParameters:nil];
 	
-	NSString *query = [request.URL query];
-	
-	// parameters in the URL query string need to be considered for the signature
-	if ([query length])
-	{
-		[extraParams addEntriesFromDictionary:DTOAuthDictionaryFromQueryString(query)];
-	}
-	
-	
-	
-	NSDictionary *authParams = [self _authorizationParametersWithExtraParameters:extraParams];
 	return [self _authorizationHeaderForRequest:request authParams:authParams];
 }
 
