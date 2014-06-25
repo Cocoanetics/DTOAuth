@@ -7,17 +7,18 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A70F8E19195ACCDD0078C54C /* DTOAuthClientTest.m in Sources */ = {isa = PBXBuildFile; fileRef = A70F8E18195ACCDD0078C54C /* DTOAuthClientTest.m */; };
+		A70F8E1A195AD0F80078C54C /* libDTOAuth_iOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A786D8E91959A2B700442121 /* libDTOAuth_iOS.a */; };
 		A786D8D41959A0F500442121 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A786D8CC1959A0DD00442121 /* main.m */; };
 		A786D8D51959A0F500442121 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A786D8D21959A0EE00442121 /* AppDelegate.m */; };
 		A786D8D61959A0F500442121 /* DiscogsOAuthClient.m in Sources */ = {isa = PBXBuildFile; fileRef = A786D8C41959A08E00442121 /* DiscogsOAuthClient.m */; };
 		A786D8D71959A0F500442121 /* TwitterOAuthClient.m in Sources */ = {isa = PBXBuildFile; fileRef = A786D8C61959A08E00442121 /* TwitterOAuthClient.m */; };
 		A786D8E31959A27200442121 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A786D8DE1959A27200442121 /* Images.xcassets */; };
 		A786D8E41959A27200442121 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A786D8E01959A27200442121 /* Main.storyboard */; };
-		A786D8F41959A2B700442121 /* libDTOAuth.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A786D8E91959A2B700442121 /* libDTOAuth.a */; };
 		A786D9081959A30D00442121 /* DTOAuthClient.m in Sources */ = {isa = PBXBuildFile; fileRef = A786D9031959A30200442121 /* DTOAuthClient.m */; };
 		A786D9091959A30D00442121 /* DTOAuthFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = A786D9051959A30200442121 /* DTOAuthFunctions.m */; };
 		A786D90A1959A30D00442121 /* DTOAuthWebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A786D9071959A30200442121 /* DTOAuthWebViewController.m */; };
-		A786D90B1959A31800442121 /* libDTOAuth.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A786D8E91959A2B700442121 /* libDTOAuth.a */; };
+		A786D90B1959A31800442121 /* libDTOAuth_iOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A786D8E91959A2B700442121 /* libDTOAuth_iOS.a */; };
 		A786D90F1959A59D00442121 /* DiscogsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A786D90E1959A59D00442121 /* DiscogsViewController.m */; };
 		A7B2733B195421F300E536A3 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7B2733A195421F300E536A3 /* Foundation.framework */; };
 		A7B2733D195421F300E536A3 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7B2733C195421F300E536A3 /* CoreGraphics.framework */; };
@@ -26,19 +27,12 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		A70F8E04195ACC090078C54C /* PBXContainerItemProxy */ = {
+		A70F8E1B195AD1240078C54C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = A7B2732F195421F300E536A3 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = A786D8E81959A2B700442121;
-			remoteInfo = DTOAuth;
-		};
-		A786D8F51959A2B700442121 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = A7B2732F195421F300E536A3 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = A786D8E81959A2B700442121;
-			remoteInfo = DTOAuth;
+			remoteInfo = "Static Library (iOS)";
 		};
 /* End PBXContainerItemProxy section */
 
@@ -55,6 +49,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		A70F8E0C195ACC7C0078C54C /* Unit Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Unit Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A70F8E17195ACCAD0078C54C /* Test-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Test-Info.plist"; sourceTree = "<group>"; };
+		A70F8E18195ACCDD0078C54C /* DTOAuthClientTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DTOAuthClientTest.m; sourceTree = "<group>"; };
 		A786D8C31959A08E00442121 /* DiscogsOAuthClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DiscogsOAuthClient.h; sourceTree = "<group>"; };
 		A786D8C41959A08E00442121 /* DiscogsOAuthClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DiscogsOAuthClient.m; sourceTree = "<group>"; };
 		A786D8C51959A08E00442121 /* TwitterOAuthClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TwitterOAuthClient.h; sourceTree = "<group>"; };
@@ -66,8 +63,7 @@
 		A786D8D21959A0EE00442121 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		A786D8DE1959A27200442121 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		A786D8E11959A27200442121 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Main.storyboard; sourceTree = "<group>"; };
-		A786D8E91959A2B700442121 /* libDTOAuth.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libDTOAuth.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		A786D8F31959A2B700442121 /* DTOAuthTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DTOAuthTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A786D8E91959A2B700442121 /* libDTOAuth_iOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libDTOAuth_iOS.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		A786D9021959A30200442121 /* DTOAuthClient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DTOAuthClient.h; sourceTree = "<group>"; };
 		A786D9031959A30200442121 /* DTOAuthClient.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DTOAuthClient.m; sourceTree = "<group>"; };
 		A786D9041959A30200442121 /* DTOAuthFunctions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DTOAuthFunctions.h; sourceTree = "<group>"; };
@@ -88,6 +84,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		A70F8E09195ACC7C0078C54C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A70F8E1A195AD0F80078C54C /* libDTOAuth_iOS.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A786D8E61959A2B700442121 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -95,19 +99,11 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		A786D8F01959A2B700442121 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				A786D8F41959A2B700442121 /* libDTOAuth.a in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		A7B27334195421F300E536A3 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A786D90B1959A31800442121 /* libDTOAuth.a in Frameworks */,
+				A786D90B1959A31800442121 /* libDTOAuth_iOS.a in Frameworks */,
 				A7B2733D195421F300E536A3 /* CoreGraphics.framework in Frameworks */,
 				A7B2733F195421F300E536A3 /* UIKit.framework in Frameworks */,
 				A7B2733B195421F300E536A3 /* Foundation.framework in Frameworks */,
@@ -117,6 +113,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		A70F8E15195ACC980078C54C /* Test */ = {
+			isa = PBXGroup;
+			children = (
+				A70F8E17195ACCAD0078C54C /* Test-Info.plist */,
+				A70F8E16195ACC980078C54C /* Source */,
+			);
+			path = Test;
+			sourceTree = "<group>";
+		};
+		A70F8E16195ACC980078C54C /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				A70F8E18195ACCDD0078C54C /* DTOAuthClientTest.m */,
+			);
+			path = Source;
+			sourceTree = "<group>";
+		};
 		A786D8B519599E6D00442121 /* Demo */ = {
 			isa = PBXGroup;
 			children = (
@@ -191,6 +204,7 @@
 			children = (
 				A786D9001959A2D700442121 /* Core */,
 				A786D8B519599E6D00442121 /* Demo */,
+				A70F8E15195ACC980078C54C /* Test */,
 				A7B27339195421F300E536A3 /* Frameworks */,
 				A7B27338195421F300E536A3 /* Products */,
 			);
@@ -200,8 +214,8 @@
 			isa = PBXGroup;
 			children = (
 				A7B27337195421F300E536A3 /* DTOAuth.app */,
-				A786D8E91959A2B700442121 /* libDTOAuth.a */,
-				A786D8F31959A2B700442121 /* DTOAuthTests.xctest */,
+				A786D8E91959A2B700442121 /* libDTOAuth_iOS.a */,
+				A70F8E0C195ACC7C0078C54C /* Unit Tests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -220,9 +234,27 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		A786D8E81959A2B700442121 /* DTOAuth */ = {
+		A70F8E0B195ACC7C0078C54C /* Unit Tests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A786D8FA1959A2B700442121 /* Build configuration list for PBXNativeTarget "DTOAuth" */;
+			buildConfigurationList = A70F8E12195ACC7C0078C54C /* Build configuration list for PBXNativeTarget "Unit Tests" */;
+			buildPhases = (
+				A70F8E08195ACC7C0078C54C /* Sources */,
+				A70F8E09195ACC7C0078C54C /* Frameworks */,
+				A70F8E0A195ACC7C0078C54C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A70F8E1C195AD1240078C54C /* PBXTargetDependency */,
+			);
+			name = "Unit Tests";
+			productName = "Unit Tests";
+			productReference = A70F8E0C195ACC7C0078C54C /* Unit Tests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		A786D8E81959A2B700442121 /* Static Library (iOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A786D8FA1959A2B700442121 /* Build configuration list for PBXNativeTarget "Static Library (iOS)" */;
 			buildPhases = (
 				A786D8E51959A2B700442121 /* Sources */,
 				A786D8E61959A2B700442121 /* Frameworks */,
@@ -232,29 +264,10 @@
 			);
 			dependencies = (
 			);
-			name = DTOAuth;
+			name = "Static Library (iOS)";
 			productName = DTOAuth;
-			productReference = A786D8E91959A2B700442121 /* libDTOAuth.a */;
+			productReference = A786D8E91959A2B700442121 /* libDTOAuth_iOS.a */;
 			productType = "com.apple.product-type.library.static";
-		};
-		A786D8F21959A2B700442121 /* DTOAuthTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = A786D8FD1959A2B700442121 /* Build configuration list for PBXNativeTarget "DTOAuthTests" */;
-			buildPhases = (
-				A786D8EF1959A2B700442121 /* Sources */,
-				A786D8F01959A2B700442121 /* Frameworks */,
-				A786D8F11959A2B700442121 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				A786D8F61959A2B700442121 /* PBXTargetDependency */,
-				A70F8E05195ACC090078C54C /* PBXTargetDependency */,
-			);
-			name = DTOAuthTests;
-			productName = DTOAuthTests;
-			productReference = A786D8F31959A2B700442121 /* DTOAuthTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		A7B27336195421F300E536A3 /* Demo */ = {
 			isa = PBXNativeTarget;
@@ -282,12 +295,11 @@
 				LastUpgradeCheck = 0510;
 				ORGANIZATIONNAME = ProductLayer;
 				TargetAttributes = {
-					A786D8E81959A2B700442121 = {
+					A70F8E0B195ACC7C0078C54C = {
 						CreatedOnToolsVersion = 6.0;
 					};
-					A786D8F21959A2B700442121 = {
+					A786D8E81959A2B700442121 = {
 						CreatedOnToolsVersion = 6.0;
-						TestTargetID = A786D8E81959A2B700442121;
 					};
 				};
 			};
@@ -305,14 +317,14 @@
 			projectRoot = "";
 			targets = (
 				A7B27336195421F300E536A3 /* Demo */,
-				A786D8E81959A2B700442121 /* DTOAuth */,
-				A786D8F21959A2B700442121 /* DTOAuthTests */,
+				A786D8E81959A2B700442121 /* Static Library (iOS) */,
+				A70F8E0B195ACC7C0078C54C /* Unit Tests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		A786D8F11959A2B700442121 /* Resources */ = {
+		A70F8E0A195ACC7C0078C54C /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -331,6 +343,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		A70F8E08195ACC7C0078C54C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A70F8E19195ACCDD0078C54C /* DTOAuthClientTest.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A786D8E51959A2B700442121 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -338,13 +358,6 @@
 				A786D90A1959A30D00442121 /* DTOAuthWebViewController.m in Sources */,
 				A786D9081959A30D00442121 /* DTOAuthClient.m in Sources */,
 				A786D9091959A30D00442121 /* DTOAuthFunctions.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		A786D8EF1959A2B700442121 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -364,15 +377,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		A70F8E05195ACC090078C54C /* PBXTargetDependency */ = {
+		A70F8E1C195AD1240078C54C /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = A786D8E81959A2B700442121 /* DTOAuth */;
-			targetProxy = A70F8E04195ACC090078C54C /* PBXContainerItemProxy */;
-		};
-		A786D8F61959A2B700442121 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = A786D8E81959A2B700442121 /* DTOAuth */;
-			targetProxy = A786D8F51959A2B700442121 /* PBXContainerItemProxy */;
+			target = A786D8E81959A2B700442121 /* Static Library (iOS) */;
+			targetProxy = A70F8E1B195AD1240078C54C /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -389,6 +397,44 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		A70F8E13195ACC7C0078C54C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = "Test/Test-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				METAL_ENABLE_DEBUG_INFO = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		A70F8E14195ACC7C0078C54C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = "Test/Test-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				METAL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		A786D8FB1959A2B700442121 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -402,7 +448,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				METAL_ENABLE_DEBUG_INFO = YES;
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = DTOAuth_iOS;
 				SKIP_INSTALL = YES;
 			};
 			name = Debug;
@@ -416,46 +462,8 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				METAL_ENABLE_DEBUG_INFO = NO;
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = DTOAuth_iOS;
 				SKIP_INSTALL = YES;
-			};
-			name = Release;
-		};
-		A786D8FE1959A2B700442121 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-				);
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = DTOAuthTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				METAL_ENABLE_DEBUG_INFO = YES;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Debug;
-		};
-		A786D8FF1959A2B700442121 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = DTOAuthTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				METAL_ENABLE_DEBUG_INFO = NO;
-				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
 		};
@@ -558,20 +566,19 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		A786D8FA1959A2B700442121 /* Build configuration list for PBXNativeTarget "DTOAuth" */ = {
+		A70F8E12195ACC7C0078C54C /* Build configuration list for PBXNativeTarget "Unit Tests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A70F8E13195ACC7C0078C54C /* Debug */,
+				A70F8E14195ACC7C0078C54C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		A786D8FA1959A2B700442121 /* Build configuration list for PBXNativeTarget "Static Library (iOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A786D8FB1959A2B700442121 /* Debug */,
 				A786D8FC1959A2B700442121 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		A786D8FD1959A2B700442121 /* Build configuration list for PBXNativeTarget "DTOAuthTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				A786D8FE1959A2B700442121 /* Debug */,
-				A786D8FF1959A2B700442121 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

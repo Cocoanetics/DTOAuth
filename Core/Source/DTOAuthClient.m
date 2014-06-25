@@ -80,6 +80,13 @@
 	return [keyValuePairs componentsJoinedByString:@"&"];
 }
 
+// helper for setting the token from unit test
+- (void)_setToken:(NSString *)token secret:(NSString *)secret
+{
+	_token = token;
+	_tokenSecret = secret;
+}
+
 #pragma mark - Creating the Authorization Header
 
 // assembles the dictionary of the standard oauth parameters for creating the signature
@@ -248,15 +255,17 @@
 
 - (NSString *)authenticationHeaderForRequest:(NSURLRequest *)request
 {
-	NSDictionary *extraParams = nil;
+	NSMutableDictionary *extraParams = [NSMutableDictionary dictionary];
 	
 	NSString *query = [request.URL query];
 	
 	// parameters in the URL query string need to be considered for the signature
 	if ([query length])
 	{
-		extraParams = DTOAuthDictionaryFromQueryString(query);
+		[extraParams addEntriesFromDictionary:DTOAuthDictionaryFromQueryString(query)];
 	}
+	
+	
 	
 	NSDictionary *authParams = [self _authorizationParametersWithExtraParameters:extraParams];
 	return [self _authorizationHeaderForRequest:request authParams:authParams];
@@ -338,8 +347,7 @@
 		
 		if (![token length] || ![tokenSecret length])
 		{
-			_token = nil;
-			_tokenSecret = nil;
+			[self _setToken:nil secret:nil];
 			
 			if (completion)
 			{
@@ -352,8 +360,7 @@
 		}
 		
 		// all is fine store the token info
-		_token = token;
-		_tokenSecret = tokenSecret;
+		[self _setToken:token secret:tokenSecret];
 		
 		if (completion)
 		{
@@ -368,8 +375,7 @@
 - (void)requestTokenWithCompletion:(void (^)(NSError *error))completion;
 {
 	// wipe previous token
-	_token = nil;
-	_tokenSecret = nil;
+	[self _setToken:nil secret:nil];
 	
 	// new request
 	NSURLRequest *request = [self tokenRequest];
@@ -390,8 +396,7 @@
 		// according to spec this value must be present
 		if (![callbackConfirmation isEqualToString:@"true"])
 		{
-			_token = nil;
-			_tokenSecret = nil;
+			[self _setToken:nil secret:nil];
 			
 			if (completion)
 			{
