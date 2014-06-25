@@ -14,6 +14,21 @@
 // callback URL is never seen by anybody, so we use this only internally
 #define CALL_BACK_URL @"http://www.whatever.org"
 
+@interface DTOAuthClient () // private properties
+
+/**
+ Block for providing a timestamp. Default implementation uses secongs since 1970. Return custom fixed value for unit tests.
+ */
+@property (nonatomic, copy) NSString *(^timestampProvider)(void);
+
+/**
+ Block for providing a nonce value. Default implementation uses a UUID. Return custom fixed value for unit tests.
+ */
+@property (nonatomic, copy) NSString *(^nonceProvider)(void);
+
+@end
+
+
 @implementation DTOAuthClient
 {
 	// consumer info set in init
@@ -44,12 +59,24 @@
 
 - (NSString *)_timestamp
 {
+	if (_timestampProvider)
+	{
+		return _timestampProvider();
+	}
+	
+	// default implementation
 	NSTimeInterval t = [[NSDate date] timeIntervalSince1970];
 	return [NSString stringWithFormat:@"%u", (int)t];
 }
 
 - (NSString *)_nonce
 {
+	if (_nonceProvider)
+	{
+		return _nonceProvider();
+	}
+	
+	// default implementation
 	NSUUID *uuid = [NSUUID UUID];
 	return [uuid UUIDString];
 }
@@ -80,6 +107,13 @@
 	return [keyValuePairs componentsJoinedByString:@"&"];
 }
 
+// helper for setting the token from unit test
+- (void)_setToken:(NSString *)token secret:(NSString *)secret
+{
+	_token = token;
+	_tokenSecret = secret;
+}
+
 #pragma mark - Creating the Authorization Header
 
 // assembles the dictionary of the standard oauth parameters for creating the signature
@@ -106,9 +140,49 @@
 	return [authParams copy];
 }
 
-// creates the OAuth Authorization header for a given request and set of auth parameters
+- (NSDictionary *)_paramsFromRequest:(NSURLRequest *)request
+{
+	NSMutableDictionary *extraParams = [NSMutableDictionary dictionary];
+	
+	NSString *query = [request.URL query];
+	
+	// parameters in the URL query string need to be considered for the signature
+	if ([query length])
+	{
+		[extraParams addEntriesFromDictionary:DTOAuthDictionaryFromQueryString(query)];
+	}
+	
+	if ([request.HTTPMethod isEqualToString:@"POST"] && [request.HTTPBody length])
+	{
+		NSString *contentType = [request allHTTPHeaderFields][@"Content-Type"];
+		
+		if ([contentType isEqualToString:@"application/x-www-form-urlencoded"])
+		{
+			NSString *bodyString = [[NSString alloc] initWithData:request.HTTPBody encoding:NSUTF8StringEncoding];
+			
+			[extraParams addEntriesFromDictionary:DTOAuthDictionaryFromQueryString(bodyString)];
+		}
+		else
+		{
+			NSLog(@"Content-Type %@ is not what we'd expect for an OAuth-authenticated POST with a body", contentType);
+		}
+	}
+	
+	return [extraParams copy];
+}
+
+//creates the OAuth Authorization header for a given request and set of auth parameters
 - (NSString *)_authorizationHeaderForRequest:(NSURLRequest *)request authParams:(NSDictionary *)authParams
 {
+	NSMutableDictionary *signatureParams = [NSMutableDictionary dictionaryWithDictionary:authParams];
+	
+	NSDictionary *requestParams = [self _paramsFromRequest:request];
+	
+	if ([requestParams count])
+	{
+		[signatureParams addEntriesFromDictionary:requestParams];
+	}
+	
 	// mutable version of the OAuth header contents to add the signature
 	NSMutableDictionary *tmpDict = [NSMutableDictionary dictionaryWithDictionary:authParams];
 	
@@ -116,7 +190,7 @@
 														  scheme:[request.URL scheme]
 															 host:[request.URL host]
 															 path:[request.URL path]
-													 authParams:authParams];
+											  signatureParams:signatureParams];
 	
 	tmpDict[@"oauth_signature"] = signature;
 	
@@ -149,9 +223,9 @@
 }
 
 // constructs the cryptographic signature for this combination of parameters
-- (NSString *)_signatureForMethod:(NSString *)method scheme:(NSString *)scheme host:(NSString *)host path:(NSString *)path authParams:(NSDictionary *)authParams
+- (NSString *)_signatureForMethod:(NSString *)method scheme:(NSString *)scheme host:(NSString *)host path:(NSString *)path signatureParams:(NSDictionary *)signatureParams
 {
-	NSString *authParamString = [self _stringFromParamDictionary:authParams];
+	NSString *authParamString = [self _stringFromParamDictionary:signatureParams];
 	NSString *signatureBase = [NSString stringWithFormat:@"%@&%@%%3A%%2F%%2F%@%@&%@",
 										[method uppercaseString],
 										[scheme lowercaseString],
@@ -248,17 +322,8 @@
 
 - (NSString *)authenticationHeaderForRequest:(NSURLRequest *)request
 {
-	NSDictionary *extraParams = nil;
+	NSDictionary *authParams = [self _authorizationParametersWithExtraParameters:nil];
 	
-	NSString *query = [request.URL query];
-	
-	// parameters in the URL query string need to be considered for the signature
-	if ([query length])
-	{
-		extraParams = DTOAuthDictionaryFromQueryString(query);
-	}
-	
-	NSDictionary *authParams = [self _authorizationParametersWithExtraParameters:extraParams];
 	return [self _authorizationHeaderForRequest:request authParams:authParams];
 }
 
@@ -338,8 +403,7 @@
 		
 		if (![token length] || ![tokenSecret length])
 		{
-			_token = nil;
-			_tokenSecret = nil;
+			[self _setToken:nil secret:nil];
 			
 			if (completion)
 			{
@@ -352,8 +416,7 @@
 		}
 		
 		// all is fine store the token info
-		_token = token;
-		_tokenSecret = tokenSecret;
+		[self _setToken:token secret:tokenSecret];
 		
 		if (completion)
 		{
@@ -368,8 +431,7 @@
 - (void)requestTokenWithCompletion:(void (^)(NSError *error))completion;
 {
 	// wipe previous token
-	_token = nil;
-	_tokenSecret = nil;
+	[self _setToken:nil secret:nil];
 	
 	// new request
 	NSURLRequest *request = [self tokenRequest];
@@ -390,8 +452,7 @@
 		// according to spec this value must be present
 		if (![callbackConfirmation isEqualToString:@"true"])
 		{
-			_token = nil;
-			_tokenSecret = nil;
+			[self _setToken:nil secret:nil];
 			
 			if (completion)
 			{

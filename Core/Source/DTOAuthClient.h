@@ -72,7 +72,8 @@
  */
 @property (nonatomic, readonly) NSString *token;
 
-#pragma mark - Subclass Methods
+
+#pragma mark - Endpoint URLs
 
 /**
  The URL to request an OAuth token from
