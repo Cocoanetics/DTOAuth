@@ -14,6 +14,21 @@
 // callback URL is never seen by anybody, so we use this only internally
 #define CALL_BACK_URL @"http://www.whatever.org"
 
+@interface DTOAuthClient () // private properties
+
+/**
+ Block for providing a timestamp. Default implementation uses secongs since 1970. Return custom fixed value for unit tests.
+ */
+@property (nonatomic, copy) NSString *(^timestampProvider)(void);
+
+/**
+ Block for providing a nonce value. Default implementation uses a UUID. Return custom fixed value for unit tests.
+ */
+@property (nonatomic, copy) NSString *(^nonceProvider)(void);
+
+@end
+
+
 @implementation DTOAuthClient
 {
 	// consumer info set in init
@@ -44,12 +59,24 @@
 
 - (NSString *)_timestamp
 {
+	if (_timestampProvider)
+	{
+		return _timestampProvider();
+	}
+	
+	// default implementation
 	NSTimeInterval t = [[NSDate date] timeIntervalSince1970];
 	return [NSString stringWithFormat:@"%u", (int)t];
 }
 
 - (NSString *)_nonce
 {
+	if (_nonceProvider)
+	{
+		return _nonceProvider();
+	}
+	
+	// default implementation
 	NSUUID *uuid = [NSUUID UUID];
 	return [uuid UUIDString];
 }
@@ -137,13 +164,12 @@
 		}
 		else
 		{
-			NSLog(@"Content-Type %@ is not what we'd expect for a POST with a body");
+			NSLog(@"Content-Type %@ is not what we'd expect for an OAuth-authenticated POST with a body", contentType);
 		}
 	}
 	
 	return [extraParams copy];
 }
-
 
 //creates the OAuth Authorization header for a given request and set of auth parameters
 - (NSString *)_authorizationHeaderForRequest:(NSURLRequest *)request authParams:(NSDictionary *)authParams
@@ -164,7 +190,7 @@
 														  scheme:[request.URL scheme]
 															 host:[request.URL host]
 															 path:[request.URL path]
-													 signatureParams:signatureParams];
+											  signatureParams:signatureParams];
 	
 	tmpDict[@"oauth_signature"] = signature;
 	
@@ -199,8 +225,6 @@
 // constructs the cryptographic signature for this combination of parameters
 - (NSString *)_signatureForMethod:(NSString *)method scheme:(NSString *)scheme host:(NSString *)host path:(NSString *)path signatureParams:(NSDictionary *)signatureParams
 {
-	NSLog(@"%@", signatureParams);
-	
 	NSString *authParamString = [self _stringFromParamDictionary:signatureParams];
 	NSString *signatureBase = [NSString stringWithFormat:@"%@&%@%%3A%%2F%%2F%@%@&%@",
 										[method uppercaseString],
@@ -208,8 +232,6 @@
 										[self _urlEncodedString:[host lowercaseString]],
 										[self _urlEncodedString:path],
 										[self _urlEncodedString:authParamString]];
-	
-	NSLog(@"%@", signatureBase);
 	
 	NSString *signatureSecret = [NSString stringWithFormat:@"%@&%@", _consumerSecret, _tokenSecret ?: @""];
 	NSData *sigbase = [signatureBase dataUsingEncoding:NSUTF8StringEncoding];

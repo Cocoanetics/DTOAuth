@@ -10,41 +10,27 @@
 #import "DTOAuthClient.h"
 #import "DTOAuthFunctions.h"
 
-// private helpers to be tested
-@interface DTTestAuthClient : DTOAuthClient
 
-@end
-
-@implementation DTTestAuthClient
-
-- (NSString *)_timestamp
-{
-	return @"1318622958";
-}
-
-- (NSString *)_nonce
-{
-	return @"kYjzVBB8Y0ZFabxSWbWovY3uYSQ2pTgmZeNu2VS4cg";
-}
-
-@end
-
+// internal methods of DTOAuthClient we are needing to access for our tests
 @interface DTOAuthClient (Test)
 
+- (NSDictionary *)_authorizationParametersWithExtraParameters:(NSDictionary *)extraParams;
 - (NSString *)_signatureForMethod:(NSString *)method scheme:(NSString *)scheme host:(NSString *)host path:(NSString *)path signatureParams:(NSDictionary *)signatureParams;
 - (void)_setToken:(NSString *)token secret:(NSString *)secret;
+@property (nonatomic, copy) NSString *(^timestampProvider)(void);
+@property (nonatomic, copy) NSString *(^nonceProvider)(void);
 
 @end
 
 
 @interface DTOAuthClientTest : XCTestCase
-
 @end
 
 @implementation DTOAuthClientTest
 
-// from: https://dev.twitter.com/docs/auth/creating-signature
-- (void)testSignature
+// client configured for Twitter's example at https://dev.twitter.com/docs/auth/creating-signature
+
+- (DTOAuthClient *)_twitterClient
 {
 	NSString *consumerKey = @"xvz1evFS4wEEPTGEFPHBog";
 	NSString *consumerSecret = @"kAcSOqF21Fu85e7zjz7ZN2U4ZRhfV3WpwPAoE3Z7kBw";
@@ -52,24 +38,66 @@
 	NSString *token = @"370773112-GmHxMAgYyLbNEtIKZeRNFsMKPR9EyMZeS9weJAEb";
 	NSString *tokenSecret = @"LswwdoUaIvS8ltyTt5jkRh4J50vUPVVHtR2YPi5kE";
 	
-	DTOAuthClient *client = [[DTTestAuthClient alloc] initWithConsumerKey:consumerKey
+	DTOAuthClient *client = [[DTOAuthClient alloc] initWithConsumerKey:consumerKey
 																		 consumerSecret:consumerSecret];
 	[client _setToken:token
 				  secret:tokenSecret];
+	
+	client.timestampProvider = ^{
+		return @"1318622958";
+	};
+	
+	client.nonceProvider = ^{
+		return @"kYjzVBB8Y0ZFabxSWbWovY3uYSQ2pTgmZeNu2VS4cg";
+	};
+	
+	return client;
+}
+
+- (void)testCollectingAuthParams
+{
+	DTOAuthClient *client = [self _twitterClient];
+
+	NSDictionary *params = [client _authorizationParametersWithExtraParameters:nil];
+	
+	id oauth_consumer_key = params[@"oauth_consumer_key"];
+	XCTAssertNotNil(oauth_consumer_key, @"oauth_consumer_key nil");
+	XCTAssertTrue([oauth_consumer_key isEqualToString:@"xvz1evFS4wEEPTGEFPHBog"], @"Wrong consumer key");
+
+	id oauth_nonce = params[@"oauth_nonce"];
+	XCTAssertNotNil(oauth_nonce, @"oauth_nonce is nil");
+	XCTAssertTrue([oauth_nonce isEqualToString:@"kYjzVBB8Y0ZFabxSWbWovY3uYSQ2pTgmZeNu2VS4cg"], @"Wrong nonce");
+
+	id oauth_signature_method = params[@"oauth_signature_method"];
+	XCTAssertNotNil(oauth_signature_method, @"oauth_signature_method nil");
+	XCTAssertTrue([oauth_signature_method isEqualToString:@"HMAC-SHA1"], @"Wrong signature method");
+
+	id oauth_timestamp = params[@"oauth_timestamp"];
+	XCTAssertNotNil(oauth_timestamp, @"oauth_timestamp nil");
+	XCTAssertTrue([oauth_timestamp isEqualToString:@"1318622958"], @"Wrong timestamp for this test");
+	
+	id oauth_token = params[@"oauth_token"];
+	XCTAssertNotNil(oauth_token, @"oauth_token is nil");
+	
+	id oauth_version = params[@"oauth_version"];
+	XCTAssertNotNil(oauth_version, @"oauth_version nil");
+	XCTAssertTrue([oauth_version isEqualToString:@"1.0"], @"Wrong OAuth version");
+}
+
+
+- (void)testSignature
+{
+	DTOAuthClient *client = [self _twitterClient];
 	
 	NSString *method = @"POST";
 	NSString *scheme = @"https";
 	NSString *host = @"api.twitter.com";
 	NSString *path = @"/1/statuses/update.json";
-	NSDictionary *params = @{@"include_entities": @"true",
-										  @"status": @"Hello Ladies + Gentlemen, a signed OAuth request!",
-										  @"oauth_consumer_key": consumerKey,
-										  @"oauth_nonce": @"kYjzVBB8Y0ZFabxSWbWovY3uYSQ2pTgmZeNu2VS4cg",
-										  @"oauth_signature_method": @"HMAC-SHA1",
-										  @"oauth_timestamp": @"1318622958",
-										  @"oauth_token" : token,
-										  @"oauth_version": @"1.0"};
 	
+	NSDictionary *extraParams = @{@"include_entities": @"true",
+											@"status": @"Hello Ladies + Gentlemen, a signed OAuth request!"};
+	
+	NSDictionary *params = [client _authorizationParametersWithExtraParameters:extraParams];
 	
 	NSString *signature = [client _signatureForMethod:method
 															 scheme:scheme
@@ -84,17 +112,7 @@
 
 - (void)testParametersInURLAndPost
 {
-	NSString *consumerKey = @"xvz1evFS4wEEPTGEFPHBog";
-	NSString *consumerSecret = @"kAcSOqF21Fu85e7zjz7ZN2U4ZRhfV3WpwPAoE3Z7kBw";
-	
-	NSString *token = @"370773112-GmHxMAgYyLbNEtIKZeRNFsMKPR9EyMZeS9weJAEb";
-	NSString *tokenSecret = @"LswwdoUaIvS8ltyTt5jkRh4J50vUPVVHtR2YPi5kE";
-	
-	DTOAuthClient *client = [[DTTestAuthClient alloc] initWithConsumerKey:consumerKey
-																		 consumerSecret:consumerSecret];
-	[client _setToken:token
-				  secret:tokenSecret];
-	
+	DTOAuthClient *client = [self _twitterClient];
 	
 	NSURL *URL = [NSURL URLWithString:@"https://api.twitter.com/1/statuses/update.json?include_entities=true"];
 	NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:URL];
