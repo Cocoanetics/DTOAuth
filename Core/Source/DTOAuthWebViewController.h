@@ -34,8 +34,8 @@
 @property (nonatomic, weak) id <OAuthResultDelegate> authorizationDelegate;
 
 /**
- Load the authorization form with a proper OAuth request, this is the request you get from step 2 in DTOAuthClient
+ Load the authorization form with a proper OAuth request, this is the request you get from step 2 in DTOAuthClient.
  */
-- (void)startAuthorizationFlowWithRequest:(NSURLRequest *)request;
+- (void)startAuthorizationFlowWithRequest:(NSURLRequest *)request completion:(void (^)(BOOL isAuthenticated, NSString *verifier))completion;
 
 @end

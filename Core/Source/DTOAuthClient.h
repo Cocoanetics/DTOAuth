@@ -73,6 +73,12 @@
 @property (nonatomic, readonly) NSString *token;
 
 
+/**
+ Returns yes if the bearer token was successfully exchanged for an authorization token
+ */
+@property (nonatomic, readonly, getter = isAuthenticated) BOOL authenticated;
+
+
 #pragma mark - Endpoint URLs
 
 /**

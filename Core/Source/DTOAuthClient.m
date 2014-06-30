@@ -327,24 +327,6 @@
 	return [self _authorizationHeaderForRequest:request authParams:authParams];
 }
 
-#pragma mark - OAuth URLs
-
-- (NSURL *)requestTokenURL
-{
-	return nil;
-}
-
-- (NSURL *)userAuthorizeURL
-{
-	return nil;
-}
-
-- (NSURL *)accessTokenURL
-{
-	return nil;
-}
-
-
 #pragma mark - Performing the Token Requests
 
 // performs the request for leg 1 or leg 3 and stores the token info if successful
@@ -477,6 +459,12 @@
 	NSURLRequest *request = [self tokenAuthorizationRequestWithVerifier:verifier];
 	
 	[self _performAuthorizedRequest:request completion:^(NSDictionary *result, NSError *error) {
+		
+		if (!error)
+		{
+			_authenticated = YES;
+		}
+		
 		if (completion)
 		{
 			completion(nil);

@@ -18,6 +18,7 @@
 	NSURLRequest *authorizationRequest;
 	
 	NSURL *_callbackURL;
+	void (^_completionHandler)(BOOL isAuthenticated, NSString *verifier);
 }
 
 #pragma mark - Initialization
@@ -91,6 +92,11 @@
 		{
 			[_authorizationDelegate authorizationWasGranted:self forToken:token withVerifier:verifier];
 		}
+		
+		if (_completionHandler)
+		{
+			_completionHandler(YES, verifier);
+		}
 	}
 	else
 	{
@@ -98,13 +104,25 @@
 		{
 			[_authorizationDelegate authorizationWasDenied:self];
 		}
+		
+		if (_completionHandler)
+		{
+			_completionHandler(NO, nil);
+		}
 	}
+	
+	_completionHandler = nil;
 }
 
 #pragma mark - Public Methods
 
-- (void)startAuthorizationFlowWithRequest:(NSURLRequest *)request
+- (void)startAuthorizationFlowWithRequest:(NSURLRequest *)request completion:(void (^)(BOOL isAuthenticated, NSString *verifier))completion
 {
+	if (completion)
+	{
+		_completionHandler = [completion copy];
+	}
+	
 	authorizationRequest = request;
 	
 	NSString *query = [request.URL query];
@@ -140,6 +158,11 @@
 - (void)cancel:(id)sender
 {
 	[_authorizationDelegate authorizationWasDenied:self];
+	
+	if (_completionHandler)
+	{
+		_completionHandler(NO, nil);
+	}
 }
 
 @end
