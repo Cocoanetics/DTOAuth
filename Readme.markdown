@@ -8,9 +8,13 @@ Usage
 
 For testing the demo app please create apps for Discogs or Twitter and add the respective consumer keys and secrets in the demo's `OAuthSettings.h`
 
+You have two options to use this component:
+* call the convenience method `-authorizeUserWithPresentingViewController:completionBlock:`
+* or do all the steps yourself for further customization: 
+
  1. Call `-requestTokenWithCompletion:` (leg 1)
  2. Get the `-userTokenAuthorizationRequest` and load it in webview, DTOAuthWebViewController is provided for this (leg 2)
- 3. Extract the verifier returned from the OAuth provider once the user authorizes the app, DTOAuthWebViewController does that via delegate method.
+ 3. Extract the verifier returned from the OAuth provider once the user authorizes the app
  4. Call `-authorizeTokenWithVerifier:completion:` passing this verifier (leg 3)
 
 License

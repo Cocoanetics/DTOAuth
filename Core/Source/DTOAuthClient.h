@@ -1,10 +1,22 @@
 //
-//  DTOAuth.h
-//  OAuthTest
+//  DTOAuthClient.h
+//  DTOAuth
 //
 //  Created by Oliver Drobnik on 6/20/14.
 //  Copyright (c) 2014 Cocoanetics. All rights reserved.
+//  Copyright (c) 2014 Kypselia. All rights reserved.
 //
+
+#define kDTOAuthHTTPStatusError 1
+#define kDTOAuthMissingTokenError 2
+#define kDTOAuthUnexpectedHTTPResponseError 3
+#define kDTOAuthMissingCallbackError 4
+#define kDTOAuthVerificationFailed 5
+
+typedef NS_ENUM(NSUInteger, OAuthVersion) {
+    OAuthVersion10,
+    OAuthVersion10a
+};
 
 /**
  Controller for an OAuth 1.0a flow with 3 legs.
@@ -22,6 +34,12 @@
  receive the consumer key and consumer secret.
  */
 - (instancetype)initWithConsumerKey:(NSString *)consumerKey consumerSecret:(NSString *)consumerSecret;
+
+/**
+ Perform the whole authorization procedure (convenience method that encapsulates all steps)
+ */
+- (void)authorizeUserWithPresentingViewController:(UIViewController *)presentingViewController completionBlock:(void(^)(NSString *token, NSError *error))completionBlock;
+
 
 /**
  @name Request Factory
@@ -67,6 +85,11 @@
  */
 
 /** 
+ OAuth version (defaults to 1.0a)
+ */
+@property (nonatomic, assign) OAuthVersion version;
+
+/** 
  The most recent token. You can use this to check the authorized token returned by the web view.
  @note This value is updated before the completion handler of one of the two requests.
  */
@@ -95,5 +118,10 @@
  The URL to verify an authorized token at
  */
 @property (nonatomic, strong) NSURL *accessTokenURL;
+
+/**
+ If the server only replies to a specific callback URL, set it here (otherwise we'll just use a dummy callback)
+ */
+@property (nonatomic, strong) NSString *callbackURLString;
 
 @end

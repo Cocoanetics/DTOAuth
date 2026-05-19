@@ -1,18 +1,18 @@
 //
-//  DTOAuth.m
-//  OAuthTest
+//  DTOAuthClient.m
+//  DTOAuth
 //
 //  Created by Oliver Drobnik on 6/20/14.
 //  Copyright (c) 2014 Cocoanetics. All rights reserved.
+//  Copyright (c) 2014 Kypselia. All rights reserved.
 //
 
 #import "DTOAuthClient.h"
 #import "DTOAuthFunctions.h"
+#import "DTOAuthWebViewController.h"
 
 #import <CommonCrypto/CommonHMAC.h>
 
-// callback URL is never seen by anybody, so we use this only internally
-#define CALL_BACK_URL @"http://www.whatever.org"
 
 @interface DTOAuthClient () // private properties
 
@@ -38,6 +38,8 @@
 	// token info stored as result of performing requests
 	NSString *_token;
 	NSString *_tokenSecret;
+
+    BOOL startedAuth;
 }
 
 #pragma mark - Initializer
@@ -50,6 +52,8 @@
 	{
 		_consumerKey = [consumerKey copy];
 		_consumerSecret = [consumerSecret copy];
+        _callbackURLString = @"http://www.whatever.org"; // dummy callback used internally (unless another callback is specified in -setCallbackURL:)
+        _version = OAuthVersion10a;
 	}
 	
 	return self;
@@ -278,7 +282,7 @@
 	NSParameterAssert(requestTokenURL);
 	
 	// create authorized request
-	NSDictionary *extraParams = @{@"oauth_callback" : CALL_BACK_URL};
+	NSDictionary *extraParams = @{@"oauth_callback" : self.callbackURLString};
 	return [self _authorizedRequestWithURL:requestTokenURL extraParameters:extraParams];
 }
 
@@ -290,7 +294,7 @@
 	NSURL *userAuthorizeURL = [self userAuthorizeURL];
 	NSParameterAssert(userAuthorizeURL);
 	
-	NSString *callback = [self _urlEncodedString:CALL_BACK_URL];
+	NSString *callback = [self _urlEncodedString:self.callbackURLString];
 	NSString *str = [NSString stringWithFormat:@"%@?oauth_token=%@&oauth_callback=%@", [userAuthorizeURL absoluteString], _token, callback];
 	NSURL *url = [NSURL URLWithString:str];
 	
@@ -307,15 +311,23 @@
 	NSParameterAssert(_token);
 	NSParameterAssert(_tokenSecret);
 	
-	// verifier must be present
-	NSParameterAssert(verifier);
+	// verifier must be present for 1.0a
+	if(self.version == OAuthVersion10a)
+	{
+		NSParameterAssert(verifier);
+	}
 	
 	NSURL *accessTokenURL = [self accessTokenURL];
 	NSParameterAssert(accessTokenURL);
 	
 	// additional params
-	NSDictionary *params = @{@"oauth_callback" : CALL_BACK_URL,
+	NSDictionary *params;
+    if(self.version == OAuthVersion10a) {
+		params = @{@"oauth_callback" : self.callbackURLString,
 									 @"oauth_verifier": verifier};
+	} else {
+		params = @{@"oauth_callback" : self.callbackURLString};
+	}
 	
 	return [self _authorizedRequestWithURL:accessTokenURL extraParameters:params];
 }
@@ -355,7 +367,7 @@
 			if ([httpResponse statusCode]!=200)
 			{
 				NSDictionary *userInfo = @{NSLocalizedDescriptionKey : s};
-				NSError *error = [NSError errorWithDomain:NSStringFromClass([self class]) code:1 userInfo:userInfo];
+				NSError *error = [NSError errorWithDomain:NSStringFromClass([self class]) code:kDTOAuthHTTPStatusError userInfo:userInfo];
 				
 				if (completion)
 				{
@@ -368,7 +380,7 @@
 		else
 		{
 			NSDictionary *userInfo = @{NSLocalizedDescriptionKey : @"Didn't receive expected HTTP response."};
-			NSError *error = [NSError errorWithDomain:NSStringFromClass([self class]) code:3 userInfo:userInfo];
+			NSError *error = [NSError errorWithDomain:NSStringFromClass([self class]) code:kDTOAuthUnexpectedHTTPResponseError userInfo:userInfo];
 			
 			if (completion)
 			{
@@ -390,7 +402,7 @@
 			if (completion)
 			{
 				NSDictionary *userInfo = @{NSLocalizedDescriptionKey : @"Missing token info in response"};
-				NSError *error = [NSError errorWithDomain:NSStringFromClass([self class]) code:2 userInfo:userInfo];
+				NSError *error = [NSError errorWithDomain:NSStringFromClass([self class]) code:kDTOAuthMissingTokenError userInfo:userInfo];
 				completion(nil, error);
 			}
 			
@@ -434,12 +446,10 @@
 		// according to spec this value must be present
 		if (![callbackConfirmation isEqualToString:@"true"])
 		{
-			[self _setToken:nil secret:nil];
-			
 			if (completion)
 			{
 				NSDictionary *userInfo = @{NSLocalizedDescriptionKey : @"Missing callback confirmation in response"};
-				NSError *error = [NSError errorWithDomain:NSStringFromClass([self class]) code:4 userInfo:userInfo];
+				NSError *error = [NSError errorWithDomain:NSStringFromClass([self class]) code:kDTOAuthMissingCallbackError userInfo:userInfo];
 				completion(error);
 			}
 			
@@ -467,9 +477,83 @@
 		
 		if (completion)
 		{
-			completion(nil);
+			completion(error);
 		}
 	}];
 }
+
+- (void)authorizeUserWithPresentingViewController:(UIViewController *)presentingViewController completionBlock:(void(^)(NSString *token, NSError *error))completionBlock {
+    if (startedAuth) {
+        // prevent doing it again returning from web view
+        return;
+    }
+    
+    __block NSError *recoverableError = nil;
+    
+    id authorizationCallback = ^(NSString *token, NSString *verifier, NSError *error) {
+        [presentingViewController dismissViewControllerAnimated:YES completion:NULL];
+        startedAuth = NO;
+        
+        if(error) {
+            completionBlock(nil, error);
+            return;
+            
+        } else if (self.version == OAuthVersion10a && [verifier length] == 0) {
+            NSDictionary *errorDictionary = @{NSLocalizedDescriptionKey:@"Authorization failed"};
+            NSError *error = [NSError errorWithDomain:NSStringFromClass([self class]) code:kDTOAuthVerificationFailed userInfo:errorDictionary];
+            completionBlock(nil, error);
+            
+        } else {
+            if ([token isEqualToString:self.token]) {
+                [self authorizeTokenWithVerifier:verifier completion:^(NSError *error) {
+                    if (error) {
+                        completionBlock(nil, error);
+                        return;
+                        
+                    } else {
+                        NSLog(@"Succesfully authentified with token %@", token);
+                        completionBlock(self.token, recoverableError);
+                    }
+                }];
+                
+            } else {
+                NSLog(@"Received authorization for token '%@' instead of requested token '%@", token, self.token);
+            }
+        }
+    };
+    
+    
+    [self requestTokenWithCompletion:^(NSError *error) {
+        if(error) {
+            if(error.code == kDTOAuthMissingCallbackError) {
+                // this is a recoverable error, let's store it for ulterior use and continue
+                recoverableError = error;
+                
+            } else {
+                completionBlock(nil, error);
+                return;
+            }
+        }
+        
+        if(self.token == nil) {
+            NSError *err = [NSError errorWithDomain:NSStringFromClass([self class]) code:kDTOAuthMissingTokenError userInfo:@{NSLocalizedDescriptionKey:@"No auth token"}];
+            completionBlock(nil, err);
+            return;
+        }
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            DTOAuthWebViewController *webViewVC = [[DTOAuthWebViewController alloc] initWithAuthorizationCallback:authorizationCallback];
+            
+            NSURLRequest *request = [self userTokenAuthorizationRequest];
+            [webViewVC startAuthorizationFlowWithRequest:request];
+            
+            UINavigationController *navVC = [[UINavigationController alloc] initWithRootViewController:webViewVC];
+            [presentingViewController presentViewController:navVC animated:YES completion:NULL];
+            
+            startedAuth = YES;
+        });
+    }];
+}
+
 
 @end

@@ -8,10 +8,9 @@
 
 #import "DiscogsViewController.h"
 #import "DiscogsOAuthClient.h"
-#import "DTOAuthWebViewController.h"
 #import "OAuthSettings.h"
 
-@interface DiscogsViewController () <OAuthResultDelegate>
+@interface DiscogsViewController ()
 
 @end
 
@@ -87,82 +86,24 @@
 
 - (IBAction)authorizeUser:(id)sender
 {
-	if (startedAuth)
-	{
-		// prevent doing it again returning from web view
-		return;
-	}
-	
-	[auth requestTokenWithCompletion:^(NSError *error) {
-		
-		if (error)
-		{
-			[self _showAlertWithTitle:@"Error requesting Token" message:[error localizedDescription]];
-			
-			return;
-		}
-		
-		dispatch_async(dispatch_get_main_queue(), ^{
-			if (auth.token)
-			{
-				NSURLRequest *request = [auth userTokenAuthorizationRequest];
-				
-				DTOAuthWebViewController *webViewVC = [[DTOAuthWebViewController alloc] init];
-				
-				UINavigationController *navVC = [[UINavigationController alloc] initWithRootViewController:webViewVC];
-				
-				webViewVC.authorizationDelegate = self;
-				[webViewVC startAuthorizationFlowWithRequest:request];
-				
-				[self presentViewController:navVC animated:YES completion:NULL];
-				
-				startedAuth = YES;
-			}
-		});
-		
-	}];
+    [auth authorizeUserWithPresentingViewController:self completionBlock:^(NSString *token, NSError *error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if(error)
+            {
+                [self _showAlertWithTitle:@"Error requesting Token" message:[error localizedDescription]];
+                return;
+            }
+            else
+            {
+                self.tokenLabel.text = @"✔";
+            }
+        });
+    }];
 }
 
 - (IBAction)accessProtectedResource:(id)sender
 {
 	[self _testConnection];
-}
-
-#pragma mark - OAuth
-
-- (void)authorizationWasDenied:(DTOAuthWebViewController *)webViewController
-{
-	[self dismissViewControllerAnimated:YES completion:NULL];
-	startedAuth = NO;
-	
-	self.tokenLabel.text = @"✖️";
-}
-
-- (void)authorizationWasGranted:(DTOAuthWebViewController *)webViewController forToken:(NSString *)token withVerifier:(NSString *)verifier
-{
-	[self dismissViewControllerAnimated:YES completion:NULL];
-	startedAuth = NO;
-	
-	if ([token isEqualToString:auth.token])
-	{
-		[auth authorizeTokenWithVerifier:verifier completion:^(NSError *error) {
-			if (error)
-			{
-				NSLog(@"Error authorizing token: %@", [error localizedDescription]);
-				return;
-			}
-			else
-			{
-				dispatch_async(dispatch_get_main_queue(), ^{
-					self.tokenLabel.text = @"✔";
-				});
-			}
-		}];
-	}
-	else
-	{
-		NSLog(@"Received authorization for token '%@' instead of requested token '%@", token, auth.token);
-	}
 }
 
 @end

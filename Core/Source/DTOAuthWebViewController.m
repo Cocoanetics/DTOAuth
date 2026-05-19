@@ -1,33 +1,31 @@
 //
-//  WebViewController.m
-//  OAuthTest
+//  DTOAuthWebViewController.m
+//  DTOAuth
 //
 //  Created by Oliver Drobnik on 6/20/14.
 //  Copyright (c) 2014 Cocoanetics. All rights reserved.
+//  Copyright (c) 2014 Kypselia. All rights reserved.
 //
 
 #import "DTOAuthWebViewController.h"
 #import "DTOAuthFunctions.h"
 
 @interface DTOAuthWebViewController () <UIWebViewDelegate>
-
+@property(nonatomic, copy) void (^authorizationCallback)(NSString *token, NSString *verifier, NSError *error);
 @end
 
 @implementation DTOAuthWebViewController
 {
 	NSURLRequest *authorizationRequest;
-	
 	NSURL *_callbackURL;
-	void (^_completionHandler)(BOOL isAuthenticated, NSString *verifier);
 }
 
 #pragma mark - Initialization
 
-- (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-	self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+- (instancetype)initWithAuthorizationCallback:(void (^)(NSString *token, NSString *verifier, NSError *error))authorizationCallback {
+	self = [self init];
 	if (self) {
-		// Custom initialization
+		self.authorizationCallback = authorizationCallback;
 	}
 	return self;
 }
@@ -86,43 +84,13 @@
 	NSString *token = params[@"oauth_token"];
 	NSString *verifier = params[@"oauth_verifier"];
 	
-	if ([verifier length])
-	{
-		if ([_authorizationDelegate respondsToSelector:@selector(authorizationWasGranted:forToken:withVerifier:)])
-		{
-			[_authorizationDelegate authorizationWasGranted:self forToken:token withVerifier:verifier];
-		}
-		
-		if (_completionHandler)
-		{
-			_completionHandler(YES, verifier);
-		}
-	}
-	else
-	{
-		if ([_authorizationDelegate respondsToSelector:@selector(authorizationWasDenied:)])
-		{
-			[_authorizationDelegate authorizationWasDenied:self];
-		}
-		
-		if (_completionHandler)
-		{
-			_completionHandler(NO, nil);
-		}
-	}
-	
-	_completionHandler = nil;
+    self.authorizationCallback(token, verifier, nil);
 }
 
 #pragma mark - Public Methods
 
-- (void)startAuthorizationFlowWithRequest:(NSURLRequest *)request completion:(void (^)(BOOL isAuthenticated, NSString *verifier))completion
+- (void)startAuthorizationFlowWithRequest:(NSURLRequest *)request
 {
-	if (completion)
-	{
-		_completionHandler = [completion copy];
-	}
-	
 	authorizationRequest = request;
 	
 	NSString *query = [request.URL query];
@@ -157,12 +125,7 @@
 
 - (void)cancel:(id)sender
 {
-	[_authorizationDelegate authorizationWasDenied:self];
-	
-	if (_completionHandler)
-	{
-		_completionHandler(NO, nil);
-	}
+    self.authorizationCallback(nil, nil, nil);
 }
 
 @end
